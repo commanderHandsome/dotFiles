@@ -6,27 +6,35 @@ call plug#begin('~/.vim/plugged')
 Plug 'tpope/vim-fugitive'
 
 " Typescript + JS + React
-Plug 'kevinoid/vim-jsonc'
 
+" syntax highlighting and improved indentation
 Plug 'pangloss/vim-javascript'
+
+" typescript syntax highlighting
 Plug 'leafgarland/typescript-vim'
+
+" React syntax highlighting and indenting
 Plug 'maxmellon/vim-jsx-pretty'
 
 " Language server
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 
-" plugin from http://vim-scripts.org/vim/scripts.html
-"Plug 'L9'
 Plug 'vim-test/vim-test'
+
+" run ack from vim
 Plug 'mileszs/ack.vim'
-Plug 'scrooloose/nerdcommenter'
+
+" comment support
+Plug 'preservim/nerdcommenter'
 
 " fuzzy file, buffer, tag, finder: https://github.com/kien/ctrlp.vim
-Plug 'kien/ctrlp.vim'
+Plug 'ctrlpvim/ctrlp.vim'
 
-
+" Provides a git gutter
 Plug 'airblade/vim-gitgutter'
-Plug 'bling/vim-airline'
+
+" status/tabline (bottome bar)
+Plug 'vim-airline/vim-airline'
 
 
 
