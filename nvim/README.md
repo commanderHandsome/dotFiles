@@ -1,9 +1,9 @@
 ### nvim commands guide
 
-#### Switchin buffers
+#### Switching buffers
 
-<C-o> or :bp
-<C-i> or :bn
+- <C-o> or :bp
+- <C-i> or :bn
 
 #### Tests
 
