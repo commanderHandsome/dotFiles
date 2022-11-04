@@ -7,7 +7,7 @@
 
 #### Tests
 
-- nmap <silent> t<C-n> :TestNearest<CR>
+- nmap <silent> t\<C-n\> :TestNearest<CR>
 - nmap <silent> t<C-f> :TestFile<CR>
 - nmap <silent> t<C-s> :TestSuite<CR>
 - nmap <silent> t<C-l> :TestLast<CR>
@@ -16,10 +16,9 @@
 
 #### Code navigation
 
-nnoremap <silent> K :call CocAction('doHover')<CR>
-
-- nmap <silent> gd <Plug>(coc-definition)
-- nmap <silent> gy <Plug>(coc-type-definition)
-- nmap <silent> gi <Plug>(coc-implementation)
-- nmap <silent> gr <Plug>(coc-references)
+- K:  CocAction('doHover')
+- gd: (coc-definition)
+- gy: (coc-type-definition)
+- gi: (coc-implementation)
+- gr: (coc-references)
 
