@@ -1,5 +1,10 @@
 ### nvim commands guide
 
+#### Switchin buffers
+
+<C-o> or :bp
+<C-i> or :bn
+
 #### Tests
 
 - nmap <silent> t<C-n> :TestNearest<CR>
