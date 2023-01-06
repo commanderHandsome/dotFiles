@@ -1,0 +1,11 @@
+
+
+# start the ssh agent
+```
+eval "$(ssh-agent)"
+```
+
+```
+ssh-add ~/.ssh/name-of-private-key
+```
+
