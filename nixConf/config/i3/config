@@ -15,6 +15,16 @@ set $mod Mod4
 # is used in the bar {} block below.
 font pango:monospace 14
 
+# Use gaps
+gaps inner 10
+gaps top 250
+gaps bottom 150
+gaps left 250
+gaps right 250
+
+# Use i3-gaps' smart gaps
+# smart_gaps on
+
 # This font is widely installed, provides lots of unicode glyphs, right-to-left
 # text rendering and scalability on retina/hidpi displays (thanks to pango).
 #font pango:DejaVu Sans Mono 8
@@ -189,10 +199,12 @@ bar {
         status_command i3status
 }
 
+exec --no-startup-id nm-applet
+exec --no-startup-id udiskie --no-notify --tray
 exec --no-startup-id thunar --daemon
-exec --no-startup-id feh --bg-fill ~/Pictures/cyberpunk2.png
+exec --no-startup-id feh --bg-fill ~/Pictures/space-art.jpg
 exec --no-startup-id picom --config ~/.config/picom/picom.conf
 
-bindsym $mod+Shift+x exec --no-startup-id bash -c 'scrot -o /tmp/lock.png && convert /tmp/lock.png -blur 0x5 /tmp/lock.png && i3lock -i /tmp/lock.png'
+bindsym $mod+Shift+x exec --no-startup-id bash -c 'scrot -z -o /tmp/lock.png && convert /tmp/lock.png -blur 0x5 /tmp/lock.png && i3lock -n -i /tmp/lock.png'
 
 

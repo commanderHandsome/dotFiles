@@ -42,50 +42,32 @@
     LC_TIME = "en_US.UTF-8";
   };
 
-  services.displayManager.defaultSession = "xfce+i3";
+  
+
+  services.displayManager.defaultSession = "none+i3";
+
   services.xserver = {
 	  enable = true;
 
-	  displayManager = {
-		  lightdm.enable = true;
-		  #defaultSession = "xfce+i3";
-	  };
+	  displayManager.lightdm.enable = true;
 
-	  desktopManager.xfce = {
-		enable = true;
-		noDesktop = true;
-		enableXfwm = false;
-	  };
+	  windowManager.i3.enable = true;
 
-
-	  windowManager = {
-		  i3 = {
-			  enable = true;
-
-			  extraPackages = with pkgs; [
-				  dmenu
-				  i3status
-				  i3lock
-				  i3blocks
-				  picom # compositor for transparency /shadows
-				  feh # wallpaper setting
-				  xterm
-				  alacritty
-				  scrot
-				  imagemagick
-			  ];
-		  };
-	  };
-
-	  # Configure keymap in X11
 	  xkb = {
 		  layout = "us";
 		  variant = "";
 	  };
-
-
   };
 
+  # Mounting support
+  services.udisks2.enable = true;
+  services.gvfs.enable = true;
+  services.devmon.enable = true;  # optional but helpful for automount
+
+  # Polkit for mount permissions
+  security.polkit.enable = true;
+
+  
   # Enable CUPS to print documents.
   services.printing = {
 	  enable = true;
@@ -97,39 +79,6 @@
     enable = true;
   };
 
-  # Load nvidia driver for Xorg and Wayland
-  services.xserver.videoDrivers = ["nvidia"];
-
-  hardware.nvidia = {
-
-    # Modesetting is required.
-    modesetting.enable = true;
-
-    # Nvidia power management. Experimental, and can cause sleep/suspend to fail.
-    # Enable this if you have graphical corruption issues or application crashes after waking
-    # up from sleep. This fixes it by saving the entire VRAM memory to /tmp/ instead 
-    # of just the bare essentials.
-    powerManagement.enable = false;
-
-    # Fine-grained power management. Turns off GPU when not in use.
-    # Experimental and only works on modern Nvidia GPUs (Turing or newer).
-    powerManagement.finegrained = false;
-
-    # Use the NVidia open source kernel module (not to be confused with the
-    # independent third-party "nouveau" open source driver).
-    # Support is limited to the Turing and later architectures. Full list of 
-    # supported GPUs is at: 
-    # https://github.com/NVIDIA/open-gpu-kernel-modules#compatible-gpus 
-    # Only available from driver 515.43.04+
-    open = false;
-
-    # Enable the Nvidia settings menu,
-	# accessible via `nvidia-settings`.
-    nvidiaSettings = true;
-
-    # Optionally, you may need to select the appropriate driver version for your specific GPU.
-    package = config.boot.kernelPackages.nvidiaPackages.stable;
-  };
 
   # Enable sound with pipewire.
   services.pulseaudio.enable = false;
@@ -149,6 +98,15 @@
 
   # Enable touchpad support (enabled default in most desktopManager).
   # services.xserver.libinput.enable = true;
+
+  # Screen locker setup
+  systemd.user.services.xss-lock = {
+	  enable = true;
+	  serviceConfig = {
+		  ExecStart = "${pkgs.xss-lock}/bin/xss-lock -- ${pkgs.i3lock}/bin/i3lock -c 000000";
+	  };
+	  wantedBy = [ "default.target" ];
+  };
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.britz = {
@@ -170,27 +128,47 @@
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
-  	neovim
-	bat
-	signal-desktop
-	xfce.thunar
-	tmux
-	gparted
-	obsidian
-	podman
-	git
-	gcc
-	lua5_1
-        luarocks
-	python312
-	python312Packages.pip
-	unzip
-	typescript
-	nodejs_24
-	ripgrep
-	keymapp
-	pandoc
-	ghostscript
+	  i3-gaps
+	  i3status
+	  dmenu
+	  alacritty
+	  xfce.thunar
+	  udiskie             # automount in tray
+	  pavucontrol         # audio control GUI
+	  networkmanagerapplet
+	  picom               # compositor
+	  feh                 # wallpaper
+	  lxappearance        # gtk theme manager
+	  i3lock
+	  xss-lock
+	  libnotify
+	  notify-osd
+	  scrot
+	  imagemagick
+
+
+	  neovim
+	  bat
+	  signal-desktop
+	  tmux
+	  tmuxinator
+	  gparted
+	  obsidian
+	  podman
+	  git
+	  gcc
+	  lua5_1
+	  luarocks
+	  python312
+	  python312Packages.pip
+	  unzip
+	  typescript
+	  nodejs_24
+	  ripgrep
+	  keymapp
+	  pandoc
+	  ghostscript
+	  foliate
   ];
 
   # Some programs need SUID wrappers, can be configured further or are
@@ -220,6 +198,10 @@
 	  nssmdns4 = true;
 	  openFirewall = true;
   };
+
+  programs.i3lock.enable = true;
+  security.pam.services.i3lock = {}; # ensures /etc/pam.d/i3lock is set up correctly
+
 
 
   
