@@ -199,11 +199,17 @@ bar {
         status_command i3status
 }
 
+# for disk mounting stuff
+exec --no-startup-id /run/current-system/sw/libexec/polkit-gnome-authentication-agent-1 &
+
 exec --no-startup-id nm-applet
 exec --no-startup-id udiskie --no-notify --tray
 exec --no-startup-id thunar --daemon
-exec --no-startup-id feh --bg-fill ~/Pictures/space-art.jpg
+exec --no-startup-id /run/current-system/sw/libexec/xfce-polkit &
+exec --no-startup-id feh --bg-fill ~/Pictures/metalGearSniperWolf.jpg
 exec --no-startup-id picom --config ~/.config/picom/picom.conf
+
+exec_always --no-startup-id feh --bg-fill ~/Pictures/metalGearSniperWolf.jpg
 
 bindsym $mod+Shift+x exec --no-startup-id bash -c 'scrot -z -o /tmp/lock.png && convert /tmp/lock.png -blur 0x5 /tmp/lock.png && i3lock -n -i /tmp/lock.png'
 
