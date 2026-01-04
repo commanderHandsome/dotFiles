@@ -56,7 +56,7 @@
         enable = true;
 
         extraPackages = with pkgs; [
-          i3-gaps
+          i3
             dmenu
             i3status
             i3lock
@@ -219,44 +219,71 @@
       thunar-archive-plugin  # optional but useful
   ];
 
+  programs.steam = {
+	enable = true;
+	remotePlay.openFirewall = true; # Open ports in the firewall for Steam Remote Play
+	dedicatedServer.openFirewall = true; # Open ports in the firewall for Source Dedicated Server
+	localNetworkGameTransfers.openFirewall = true; # Open ports in the firewall for Steam Local Network Game Transfers
+  };
+
 # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
 
 # List packages installed in system profile. To search, run:
 # $ nix search wget
   environment.systemPackages = with pkgs; [
-    neovim
       bat
-      signal-desktop
-      tmux
-      gparted
-      obsidian
-      podman
-      git
+      blender          # optional: kdenlive uses this for some render pipelines
+      chromium
+      ffmpeg
+      fzf
       gcc
+      ghostscript
+      gimp3-with-plugins
+      git
+      gparted
+      inkscape
+      kdePackages.kdenlive
+      keymapp
       lua5_1
       luarocks
+      nodejs_24
+      obsidian
+      obsidian-export
+      pandoc
+      podman
       python312
       python312Packages.pip
-      unzip
-      typescript
-      nodejs_24
+      qpdf
       ripgrep
-      keymapp
-      pandoc
+      signal-desktop
       texlive.combined.scheme-medium
-      ghostscript
+      tmux
+      typescript
+      unzip
+      vlc              # optional: good debugging player
+      wkhtmltopdf
+      zoom-us
       zoxide
-      fzf
+      neovim
       ];
+
 
   fonts = {
     enableDefaultPackages = true;  # keep standard Unicode coverage
       packages = with pkgs; [
-        nerd-fonts.jetbrains-mono
-        nerd-fonts.fira-code
+	      dejavu_fonts
+	      fira
+	      font-awesome
+	      ibm-plex
+	      nerd-fonts.fira-code
+	      nerd-fonts.jetbrains-mono
+	      open-sans
+	      source-han-sans
       ];
+
   };
+
 
 
 # (Optional) Configure default monospace fonts for fontconfig:
