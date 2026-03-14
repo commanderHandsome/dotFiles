@@ -42,7 +42,6 @@ exec --no-startup-id xss-lock --transfer-sleep-lock -- i3lock --nofork
 
 # NetworkManager is the most popular way to manage wireless networks on Linux,
 # and nm-applet is a desktop environment-independent system tray GUI for it.
-exec --no-startup-id nm-applet
 
 # Use pactl to adjust volume in PulseAudio.
 set $refresh_i3status killall -SIGUSR1 i3status
@@ -191,7 +190,10 @@ mode "resize" {
         bindsym $mod+r mode "default"
 }
 
+
 bindsym $mod+r mode "resize"
+
+
 
 # Start i3bar to display a workspace bar (plus the system information i3status
 # finds out, if available)
@@ -200,17 +202,14 @@ bar {
 }
 
 # for disk mounting stuff
-exec --no-startup-id /run/current-system/sw/libexec/polkit-gnome-authentication-agent-1 &
-
 exec --no-startup-id nm-applet
 exec --no-startup-id udiskie --no-notify --tray
 exec --no-startup-id thunar --daemon
-exec --no-startup-id /run/current-system/sw/libexec/xfce-polkit &
 exec --no-startup-id feh --bg-fill ~/Pictures/metalGearSniperWolf.jpg
-exec --no-startup-id picom --config ~/.config/picom/picom.conf
+exec --no-startup-id /usr/libexec/polkit-kde-authentication-agent-1
 
 exec_always --no-startup-id feh --bg-fill ~/Pictures/metalGearSniperWolf.jpg
 
 bindsym $mod+Shift+x exec --no-startup-id bash -c 'scrot -z -o /tmp/lock.png && convert /tmp/lock.png -blur 0x5 /tmp/lock.png && i3lock -n -i /tmp/lock.png'
 
-
+exec --no-startup-id xrandr --output HDMI-1 --auto --right-of eDP-1
