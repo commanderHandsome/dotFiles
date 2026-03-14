@@ -266,6 +266,10 @@
       zoom-us
       zoxide
       neovim
+      p7zip
+      libreoffice
+      obs-studio
+      gromit-mpx
       ];
 
 
