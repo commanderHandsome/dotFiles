@@ -1,25 +1,18 @@
-# Edit this configuration file to define what should be installed on
-# your system.  Help is available in the configuration.nix(5) man page
-# and in the NixOS manual (accessible by running ‘nixos-help’).
-
 { config, pkgs, ... }:
 
 {
   imports =
     [ # Include the results of the hardware scan.
-    ./hardware-configuration.nix
+      ./hardware-configuration.nix
     ];
 
 # Bootloader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
+  # Loading NVIDIA modules early ensures Wayland starts correctly on your 4060
+  boot.initrd.kernelModules = [ "nvidia" "nvidia_modeset" "nvidia_uvm" "nvidia_drm" ];
 
   networking.hostName = "nixos"; # Define your hostname.
-# networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
-
-# Configure network proxy if necessary
-# networking.proxy.default = "http://user:password@proxy:port/";
-# networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
 
 # Enable networking
     networking.networkmanager.enable = true;
@@ -42,62 +35,22 @@
     LC_TIME = "en_US.UTF-8";
   };
 
-  services.displayManager.defaultSession = "none+i3";
-  services.xserver = {
-    enable = true;
-
-    displayManager = {
-      lightdm.enable = true;
-    };
-
-
-    windowManager = {
-      i3 = {
-        enable = true;
-
-        extraPackages = with pkgs; [
-          i3
-            dmenu
-            i3status
-            i3lock
-            i3blocks
-            picom # compositor for transparency /shadows
-            feh # wallpaper setting
-            xterm
-            alacritty
-            scrot
-            imagemagick
-            udiskie     # automount in tray
-            pavucontrol # audio control gui
-            networkmanagerapplet
-            lxappearance #gtk theme manager
-            xss-lock
-            libnotify
-            notify-osd
-            xfce.thunar
-            polkit
-            polkit_gnome
-            ];
-      };
-    };
-
-# Configure keymap in X11
-    xkb = {
-      layout = "us";
-      variant = "";
-    };
-
-
+  services.greetd = {
+	  enable = true;
+	  settings = {
+		  default_session = {
+			  command = "${pkgs.greetd.tuigreet}/bin/tuigreet --time --cmd Hyprland";
+			  user = "britz";
+		  };
+	  };
   };
 
 # Mounting support
   services.udisks2.enable = true;
   services.gvfs.enable = true;
-  services.devmon.enable = true;  # optional but helpful for automount
+  services.devmon.enable = true;
   services.tumbler.enable = true;
-  services.udev.packages = with pkgs; [
-    zsa-udev-rules
-  ];
+  services.udev.packages = with pkgs; [ zsa-udev-rules ];
 
 # Polkit for mount permissions
   security.polkit.enable = true;
@@ -108,42 +61,19 @@
     drivers = [ pkgs.brlaser ];
   };
 
-# Enable OpenGL
+# Enable Graphics
   hardware.graphics = {
     enable = true;
   };
 
-# Load nvidia driver for Xorg and Wayland
   services.xserver.videoDrivers = ["nvidia"];
 
   hardware.nvidia = {
-
-# Modesetting is required.
     modesetting.enable = true;
-
-# Nvidia power management. Experimental, and can cause sleep/suspend to fail.
-# Enable this if you have graphical corruption issues or application crashes after waking
-# up from sleep. This fixes it by saving the entire VRAM memory to /tmp/ instead 
-# of just the bare essentials.
     powerManagement.enable = false;
-
-# Fine-grained power management. Turns off GPU when not in use.
-# Experimental and only works on modern Nvidia GPUs (Turing or newer).
     powerManagement.finegrained = false;
-
-# Use the NVidia open source kernel module (not to be confused with the
-# independent third-party "nouveau" open source driver).
-# Support is limited to the Turing and later architectures. Full list of 
-# supported GPUs is at: 
-# https://github.com/NVIDIA/open-gpu-kernel-modules#compatible-gpus 
-# Only available from driver 515.43.04+
     open = false;
-
-# Enable the Nvidia settings menu,
-# accessible via `nvidia-settings`.
     nvidiaSettings = true;
-
-# Optionally, you may need to select the appropriate driver version for your specific GPU.
     package = config.boot.kernelPackages.nvidiaPackages.stable;
   };
 
@@ -155,24 +85,6 @@
     alsa.enable = true;
     alsa.support32Bit = true;
     pulse.enable = true;
-# If you want to use JACK applications, uncomment this
-#jack.enable = true;
-
-# use the example session manager (no others are packaged yet so this is enabled by default,
-# no need to redefine it in your config for now)
-#media-session.enable = true;
-  };
-
-# Enable touchpad support (enabled default in most desktopManager).
-# services.xserver.libinput.enable = true;
-
-# Screen locker setup
-  systemd.user.services.xss-lock = {
-    enable = true;
-    serviceConfig = {
-      ExecStart = "${pkgs.xss-lock}/bin/xss-lock -- ${pkgs.i3lock}/bin/i3lock -c 000000";
-    };
-    wantedBy = [ "default.target" ];
   };
 
   systemd.user.services.polkit-gnome-authentication-agent-1 = {
@@ -196,143 +108,95 @@
         });
   '';
 
-
-# Define a user account. Don't forget to set a password with ‘passwd’.
+# User account
   users.users.britz = {
     isNormalUser = true;
     description = "Johnathon Britz";
     extraGroups = [ "networkmanager" "wheel" ];
-    packages = with pkgs; [
-#  thunderbird
-    ];
+    packages = with pkgs; [ ];
   };
 
-# Install firefox.
   programs.firefox.enable = true;
   programs.dconf.enable = true;
-
-
   programs.xfconf.enable = true;
   programs.thunar.enable = true;
   programs.thunar.plugins = with pkgs.xfce; [
     thunar-volman
-      thunar-archive-plugin  # optional but useful
+    thunar-archive-plugin
   ];
 
-  programs.steam = {
-	enable = true;
-	remotePlay.openFirewall = true; # Open ports in the firewall for Steam Remote Play
-	dedicatedServer.openFirewall = true; # Open ports in the firewall for Source Dedicated Server
-	localNetworkGameTransfers.openFirewall = true; # Open ports in the firewall for Steam Local Network Game Transfers
+  programs.hyprland = {
+  	enable = true;
+	withUWSM = true;
+	xwayland.enable = true;
   };
 
-# Allow unfree packages
+  programs.hyprlock.enable = true;
+
+  # Environment variables for NVIDIA and Electron/Wayland compatibility 
+  environment.sessionVariables = {
+    NIXOS_OZONE_WL = "1";
+    LIBVA_DRIVER_NAME = "nvidia";
+    GBM_BACKEND = "nvidia-drm";
+    __GLX_VENDOR_LIBRARY_NAME = "nvidia";
+  };
+
   nixpkgs.config.allowUnfree = true;
 
-# List packages installed in system profile. To search, run:
-# $ nix search wget
   environment.systemPackages = with pkgs; [
-      bat
-      blender          # optional: kdenlive uses this for some render pipelines
-      chromium
-      ffmpeg
-      fzf
-      gcc
-      ghostscript
-      gimp3-with-plugins
-      git
-      gparted
-      inkscape
-      kdePackages.kdenlive
-      keymapp
-      lua5_1
-      luarocks
-      nodejs_24
-      obsidian
-      obsidian-export
-      pandoc
-      podman
-      python312
-      python312Packages.pip
-      qpdf
-      ripgrep
-      signal-desktop
-      texlive.combined.scheme-medium
-      tmux
-      typescript
-      unzip
-      vlc              # optional: good debugging player
-      wkhtmltopdf
-      zoom-us
-      zoxide
-      neovim
-      p7zip
-      libreoffice
-      obs-studio
-      gromit-mpx
-      ];
+      # Wayland-native replacements for your i3 tools [cite: 14]
+      waybar       # Status bar
+      wofi         # Launcher
+      hyprpaper    # Wallpaper
+      hyprlock     # Screen locker
+      grim         # Screenshots
+      slurp        # Region selection
+      wl-clipboard # Clipboard support
+      hypridle
+      kitty
 
+      # moder wayland utilities
+      yazi
+      cliphist
+      swaynotificationcenter
+ 
+
+      # Core Utilities from your old config [cite: 15, 16]
+      alacritty
+      udiskie
+      pavucontrol
+      networkmanagerapplet
+      libnotify
+      polkit_gnome
+      
+      # Your Applications [cite: 55, 56, 57]
+      bat blender chromium ffmpeg fzf gcc ghostscript 
+      git kdePackages.kdenlive keymapp lua5_1 luarocks nodejs_24
+      obsidian obsidian-export pandoc podman python312 qpdf ripgrep
+      signal-desktop tmux unzip vlc zoom-us zoxide neovim p7zip
+      libreoffice obs-studio gromit-mpx
+  ];
 
   fonts = {
-    enableDefaultPackages = true;  # keep standard Unicode coverage
-      packages = with pkgs; [
-	      dejavu_fonts
-	      fira
-	      font-awesome
-	      ibm-plex
-	      nerd-fonts.fira-code
-	      nerd-fonts.jetbrains-mono
-	      open-sans
-	      source-han-sans
-      ];
-
+    enableDefaultPackages = true;
+    packages = with pkgs; [
+      dejavu_fonts fira font-awesome ibm-plex open-sans source-han-sans
+      nerd-fonts.fira-code nerd-fonts.jetbrains-mono
+    ];
   };
 
-
-
-# (Optional) Configure default monospace fonts for fontconfig:
   fonts.fontconfig.defaultFonts = {
     monospace = [ "JetBrainsMono Nerd Font" "Fira Code Nerd Font" ];
   };
 
-
-# Some programs need SUID wrappers, can be configured further or are
-# started in user sessions.
-# programs.mtr.enable = true;
-# programs.gnupg.agent = {
-#   enable = true;
-#   enableSSHSupport = true;
-# };
-
-# List services that you want to enable:
-
-# Enable the OpenSSH daemon.
   services.openssh.enable = true;
   services.dbus.enable = true;
 
-
-# Open ports in the firewall.
-# networking.firewall.allowedTCPPorts = [ ... ];
-# networking.firewall.allowedUDPPorts = [ ... ];
-# Or disable the firewall altogether.
-# networking.firewall.enable = false;
-
-
-# printing stuff
   services.avahi = {
     enable = true;
     nssmdns4 = true;
     openFirewall = true;
   };
 
-
-
-# This value determines the NixOS release from which the default
-# settings for stateful data, like file locations and database versions
-# on your system were taken. It‘s perfectly fine and recommended to leave
-# this value at the release version of the first install of this system.
-# Before changing this value read the documentation for this option
-# (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
-  system.stateVersion = "24.11"; # Did you read the comment?
-
+  system.stateVersion = "24.11";
 }
